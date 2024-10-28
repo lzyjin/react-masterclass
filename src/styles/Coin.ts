@@ -3,7 +3,7 @@ import styled from "styled-components";
 export const Overview = styled.div`
   display: flex;
   justify-content: space-between;
-  background-color: rgba(0, 0, 0, 0.5);
+    background-color: rgba(0, 0, 0, 0.1);
   padding: 10px 20px;
   border-radius: 10px;
 `;
@@ -18,6 +18,7 @@ export const OverviewItem = styled.div`
     margin-bottom: 5px;
   }
 `;
+
 export const Description = styled.p`
   margin: 20px 0;
 `;
@@ -34,7 +35,7 @@ export const Tab = styled.span<{ isActive: boolean }>`
   text-transform: uppercase;
   font-size: 12px;
   font-weight: 400;
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: rgba(0, 0, 0, 0.1);
   border-radius: 10px;
   color: ${(props) => props.isActive ? props.theme.accentColor : props.theme.textColor};
   

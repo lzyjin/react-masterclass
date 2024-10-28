@@ -23,8 +23,8 @@ export const CoinList = styled.ul`
 `;
 
 export const Coin = styled.li`
-  background-color: #fff;
-  color: ${props => props.theme.bgColor};
+  background-color: rgba(0, 0, 0, 0.1);
+  color: ${props => props.theme.textColor};
   margin-bottom: 1em;
   font-size: 1.125rem;
   border-radius: 1em;
