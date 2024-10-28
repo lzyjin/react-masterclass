@@ -1,8 +1,9 @@
 import {Link} from "react-router-dom";
-import {useEffect, useState} from "react";
 import {Container, Header, Title, Loader, CoinList, Coin, Img} from "../styles/Coins";
+import {useQuery} from "@tanstack/react-query";
+import {fetchCoins} from "../api";
 
-interface CoinInterface {
+interface ICoin {
   id: string;
   name: string;
   symbol: string;
@@ -13,17 +14,7 @@ interface CoinInterface {
 }
 
 export default function Coins() {
-  const [coins, setCoins] = useState<CoinInterface[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    (async () => {
-      const response = await fetch(`https://api.coinpaprika.com/v1/coins`)
-      const json = await response.json();
-      setCoins(json.slice(0, 50));
-      setLoading(false);
-    })();
-  }, []);
+  const { isPending, data } = useQuery<ICoin[]>({ queryKey: ["allCoins"], queryFn: fetchCoins });
 
   return (
     <div>
@@ -32,11 +23,11 @@ export default function Coins() {
           <Title>Coins</Title>
         </Header>
         {
-          loading ?
+          isPending ?
           <Loader>Loading...</Loader> :
           <CoinList>
             {
-              coins.map(coin => (
+              data?.slice(0, 50).map(coin => (
                 <Coin key={coin.id}>
                   <Link to={`/${coin.id}`}  state={{ name: coin.name }}>
                     <Img src={`https://cryptocurrencyliveprices.com/img/${coin.id}.png`} alt=""/>
