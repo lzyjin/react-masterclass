@@ -1,5 +1,8 @@
-import {createGlobalStyle} from "styled-components";
-import ToDoList from "./ToDoList";
+import {createGlobalStyle, styled} from "styled-components";
+import {DragDropContext, DropResult} from "react-beautiful-dnd";
+import {useRecoilState} from "recoil";
+import {toDoState} from "./atoms";
+import Board from "./components/Board";
 
 const GlobalStyle = createGlobalStyle`
   /* http://meyerweb.com/eric/tools/css/reset/
@@ -70,11 +73,79 @@ const GlobalStyle = createGlobalStyle`
   }
 `;
 
+const Wrapper = styled.div`
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    max-width: 680px;
+    width: 100%;
+    height: 100vh;
+    margin: 0 auto;
+`;
+
+const Boards = styled.div`
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+`;
+
 export default function App() {
+  const [toDos, setToDos] = useRecoilState(toDoState);
+
+  const onDragEnd = (info: DropResult) => {
+    const {destination, source, draggableId} = info;
+
+    if(!destination) {
+      return;
+    }
+
+    if(destination?.droppableId === source.droppableId) {
+      // same board movement.
+      setToDos(allBoards => {
+        const boardCopy = [...allBoards[source.droppableId]];
+        const taskObj = boardCopy[source.index];
+        boardCopy.splice(source.index, 1);
+        boardCopy.splice(destination?.index, 0, taskObj);
+        return {
+          ...allBoards,
+          [source.droppableId]: boardCopy
+        };
+      });
+    }
+
+    if(destination?.droppableId !== source.droppableId) {
+      // cross board movement
+      setToDos(allBoards => {
+        const sourceBoard = [...allBoards[source.droppableId]];
+        const destinationBoard = [...allBoards[destination.droppableId]];
+        const taskObj = sourceBoard[source.index];
+        sourceBoard.splice(source.index, 1);
+        destinationBoard.splice(destination?.index, 0, taskObj);
+        return {
+          ...allBoards,
+          [source.droppableId]: sourceBoard,
+          [destination.droppableId]: destinationBoard,
+        };
+      });
+    }
+
+  };
+
   return (
     <>
       <GlobalStyle />
-      <ToDoList />
+      <DragDropContext onDragEnd={onDragEnd}>
+        <Wrapper>
+          <Boards>
+            {
+              Object.keys(toDos).map(boardId => (
+                <Board key={boardId} boardId={boardId} toDos={toDos[boardId]}/>
+              ))
+            }
+          </Boards>
+        </Wrapper>
+      </DragDropContext>
     </>
   );
 }
