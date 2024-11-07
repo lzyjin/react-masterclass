@@ -1,13 +1,17 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import {RecoilRoot} from "recoil";
-import {darkTheme} from "./theme";
+import {theme} from "./theme";
 import {createGlobalStyle, ThemeProvider} from "styled-components";
-import App from "./App";
+import {RouterProvider} from "react-router-dom";
+import {router} from "./router";
+import {QueryClient, QueryClientProvider} from "@tanstack/react-query";
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
 );
+
+const queryClient = new QueryClient();
 
 const GlobalStyle = createGlobalStyle`
   /* http://meyerweb.com/eric/tools/css/reset/
@@ -55,7 +59,6 @@ const GlobalStyle = createGlobalStyle`
   }
   blockquote:before, blockquote:after,
   q:before, q:after {
-    content: '';
     content: none;
   }
   table {
@@ -65,11 +68,11 @@ const GlobalStyle = createGlobalStyle`
   
   /* custom styles */
   body {
-      font-weight: 300;
       font-family: 'Source Sans Pro', sans-serif;
-      color:black;
+      font-weight: 400;
+      color: ${props => props.theme.white.darker};
       line-height: 1.2;
-      background:linear-gradient(135deg,#e09,#d0e);
+      background-color: #000;
   }
   a {
       text-decoration: none;
@@ -81,12 +84,14 @@ const GlobalStyle = createGlobalStyle`
 `;
 
 root.render(
-  // <React.StrictMode>
+  <React.StrictMode>
     <RecoilRoot>
-      <ThemeProvider theme={ darkTheme }>
-        <GlobalStyle />
-        <App />
-      </ThemeProvider>
+      <QueryClientProvider client={queryClient}>
+        <ThemeProvider theme={ theme }>
+          <GlobalStyle />
+          <RouterProvider router={router} />
+        </ThemeProvider>
+      </QueryClientProvider>
     </RecoilRoot>
-  // </React.StrictMode>
+  </React.StrictMode>
 );
